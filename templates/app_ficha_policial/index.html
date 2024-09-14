@@ -1,0 +1,290 @@
+{% extends "app_ficha_policial/base.html" %}
+
+{% block content %}
+<h1 class="great-vibes-regular text-center text-light">Registro de Policiais Militares de Pernambuco</h1>
+
+<div class="container-fluid">
+    <!-- Formulário de Busca -->
+    <form method="GET" action="{% url 'index' %}" id="form-busca">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="nome" class="text-light">Nome:</label>
+                <input type="text" name="nome" id="nome" class="form-control" placeholder="Digite o nome">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="matricula" class="text-light">Matrícula:</label>
+                <input type="number" name="matricula" id="matricula" class="form-control" placeholder="Digite a matrícula">
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-start mb-3">
+            <button type="submit" class="btn btn-warning">Buscar</button>
+            <button type="button" class="btn btn-secondary ms-2" id="btn-limpar">Limpar</button>
+        </div>
+    </form>
+
+    <!-- Botões de Colapso -->
+    <div class="mb-3">
+        <a class="btn btn-primary me-2" data-bs-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
+            Ciatur
+        </a>
+        <a class="btn btn-danger" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
+            Tropa
+        </a>                
+    </div>
+
+    <!-- Botão no canto superior direito -->
+   <!-- Botões para Adicionar e Editar Ficha Policial -->
+<div class="d-flex justify-content-end mb-3">
+  <button class="btn btn-success me-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+      Adicionar Ficha Policial
+  </button>
+  
+</div>
+
+
+    <!-- Formulário Colapsado -->
+    <div class="collapse mt-3" id="collapseForm">
+        <div class="card card-body">
+            <form method="POST" action="{% url 'adicionar_ficha' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="grad">Posto/Graduação:</label>
+                        <select class="form-control" id="grad" name="grad">
+                            <option value="SD">Soldado (SD)</option>
+                            <option value="CB">Cabo (CB)</option>
+                            <option value="3º SGT">3º Sargento (3º SGT)</option>
+                            <option value="2º SGT">2º Sargento (2º SGT)</option>
+                            <option value="1º SGT">1º Sargento (1º SGT)</option>
+                            <option value="SUBTEN">Subtenente (SUBTEN)</option>
+                            <option value="2º TEN">2º Tenente (2º TEN)</option>
+                            <option value="1º TEN">1º Tenente (1º TEN)</option>
+                            <option value="CAP">Capitão (CAP)</option>
+                            <option value="MAJ">Major (MAJ)</option>
+                            <option value="TC">Tenente Coronel (TC)</option>
+                            <option value="CEL">Coronel (CEL)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="matr">Matrícula:</label>
+                        <input type="number" class="form-control" id="matr" name="matr">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nome">Nome:</label>
+                        <input type="text" class="form-control" id="nome" name="nome">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="ome">OME:</label>
+                        <input type="text" class="form-control" id="ome" name="ome">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="dispo">Disposição:</label>
+                        <input type="text" class="form-control" id="dispo" name="dispo">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="sexo">Sexo:</label>
+                        <input type="text" class="form-control" id="sexo" name="sexo">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="cpf">CPF:</label>
+                        <input type="text" class="form-control" id="cpf" name="cpf">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="quadro">Quadro:</label>
+                        <input type="text" class="form-control" id="quadro" name="quadro">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="rg">RG:</label>
+                        <input type="text" class="form-control" id="rg" name="rg">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success mt-3">Adicionar</button>
+            </form>
+        </div>
+    </div>
+
+   <!-- Exibir mensagens -->
+{% if messages %}
+<div class="alert alert-info">
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+</div>
+{% endif %}
+
+    <!-- Resultados da Pesquisa -->
+    <div id="resultados-pesquisa">
+        <div class="bg-primary card card-body">
+            <h2 class="text-dark">Lista de Policiais</h2>
+            <div class="table-responsive">
+                <table class="table table-striped table-primary table-hover">
+                    <thead>
+                      {% if fichas %}
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>OME</th>
+                            <th>Disposição</th>
+                            <th>Sexo</th>
+                            <th>CPF</th>
+                            <th>Quadro</th>
+                            <th>RG</th>
+                            <th>Editar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                            {% for ficha in fichas %}
+                            <tr>
+                                <td>{{ ficha.grad }}</td>
+                                <td>{{ ficha.nome }}</td>
+                                <td>{{ ficha.matr }}</td>
+                                <td>{{ ficha.ome }}</td>
+                                <td>{{ ficha.dispo }}</td>
+                                <td>{{ ficha.sexo }}</td>
+                                <td>{{ ficha.cpf }}</td>
+                                <td>{{ ficha.quadro }}</td>
+                                <td>{{ ficha.rg|floatformat:0 }}</td>
+                                <td><a href="{% url 'editar_ficha' ficha.matr %}" class="btn btn-primary">Editar</a></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seções colapsáveis -->
+    <div class="collapse" id="collapseExample2">
+        <div class="bg-primary card card-body">
+            <h2 class="text-light">Ciatur</h2><label><b>Total: {{quant_total}} </b></label>
+            <div class="table-responsive">
+                <table class="table table-striped table-primary table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>OME</th>
+                            <th>Disposição</th>
+                            <th>Sexo</th>
+                            <th>CPF</th>
+                            <th>Quadro</th>
+                            <th>RG</th>
+                            <th>Editar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if bpm %}
+                            {% for ficha in bpm %}
+                            <tr>
+                                <td>{{ ficha.grad }}</td>
+                                <td>{{ ficha.nome }}</td>
+                                <td>{{ ficha.matr }}</td>
+                                <td>{{ ficha.ome }}</td>
+                                <td>{{ ficha.dispo }}</td>
+                                <td>{{ ficha.sexo }}</td>
+                                <td>{{ ficha.cpf }}</td>
+                                <td>{{ ficha.quadro }}</td>
+                                <td>{{ ficha.rg|floatformat:0 }}</td>
+                                <td><a href="{% url 'editar_ficha' ficha.matr %}" class="btn btn-primary">Editar</a></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center">Nenhuma ficha registrada na Ciatur.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="collapse" id="collapseExample3">
+        <div class="bg-primary card card-body">
+            <h2 class="text-light">Tropa PMPE</h2><label><b>Total: {{quant_total_geral}} </b></label>
+            <div class="table-responsive">
+                <table class="table table-striped table-primary table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Nome</th>
+                            <th>Matrícula</th>
+                            <th>OME</th>
+                            <th>Disposição</th>
+                            <th>Sexo</th>
+                            <th>CPF</th>
+                            <th>Quadro</th>
+                            <th>RG</th>
+                          
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if ficha %}
+                            {% for ficha in ficha %}
+                            <tr>
+                                <td>{{ ficha.grad }}</td>
+                                <td>{{ ficha.nome }}</td>
+                                <td>{{ ficha.matr }}</td>
+                                <td>{{ ficha.ome }}</td>
+                                <td>{{ ficha.dispo }}</td>
+                                <td>{{ ficha.sexo }}</td>
+                                <td>{{ ficha.cpf }}</td>
+                                <td>{{ ficha.quadro }}</td>
+                                <td>{{ ficha.rg|floatformat:0 }}</td>
+                              
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center">Nenhuma ficha registrada na tropa.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para limpar o formulário, fechar os collapses e limpar resultados -->
+<<script>
+  document.getElementById('btn-limpar').addEventListener('click', function() {
+      // Limpar os campos do formulário
+      document.getElementById('form-busca').reset();
+
+      // Limpar os resultados da pesquisa
+      document.getElementById('resultados-pesquisa').innerHTML = '';
+
+      // Fechar todos os colapsos abertos
+      document.querySelectorAll('.collapse').forEach(collapse => {
+          let bsCollapse = new bootstrap.Collapse(collapse, {
+              toggle: false // Não abre se já estiver fechado
+          });
+          bsCollapse.hide(); // Fecha o colapso
+      });
+  });
+</script>
+
+{% endblock %}

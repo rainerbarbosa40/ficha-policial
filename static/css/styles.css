@@ -1,0 +1,19 @@
+/* Reduz o tamanho dos inputs */
+.custom-input {
+    width: 100%;  /* Faz o input ocupar toda a largura disponível do container */
+    max-width: 150px;  /* Ajuste conforme necessário */
+    max-height: 20px;  /* Define uma altura menor para o input */
+    padding: 0.25rem;  /* Ajusta o preenchimento interno */
+    font-size: 0.75rem;  /* Ajuste o tamanho da fonte */
+    box-sizing: border-box;  /* Inclui padding e border na largura e altura total */
+}
+
+/* Reduz a altura das linhas da tabela */
+.table td, .table th {
+    padding: 0.25rem;  /* Ajusta o padding das células da tabela */
+}
+
+/* Reduz a altura da linha da tabela */
+.table tr {
+    height: 30px;  /* Ajusta a altura das linhas da tabela */
+}

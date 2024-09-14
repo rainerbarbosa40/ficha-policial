@@ -1,0 +1,30 @@
+{% extends "app_ficha_policial/base.html" %}
+{% load static %}
+{% load custom_filters %}  <!-- Carrega o filtro customizado -->
+
+{% block content %}
+<h2>Editar Ficha Policial</h2>
+<form method="POST">
+    {% csrf_token %}
+    <table class="table table-striped table-primary table-hover">
+        <tbody>
+            {% for field in form %}
+            <tr>
+                <td><label for="{{ field.id_for_label }}">{{ field.label }}</label></td>
+                <td>
+                    {% if field.field.widget.input_type == 'text' %}
+                        {{ field|add_class:"custom-input" }} <!-- Adiciona a classe personalizada ao input text -->
+                    {% else %}
+                        {{ field }} <!-- Para outros tipos de campos, exiba normalmente -->
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="form-group">
+        <button type="submit" class="btn btn-success">Salvar</button>
+        <a href="{% url 'index' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+{% endblock %}
